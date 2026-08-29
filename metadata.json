@@ -1,0 +1,6 @@
+{
+  "name": "Minimalist Portfolio",
+  "description": "A premium professional portfolio with a minimalist aesthetic and smooth scroll animations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
