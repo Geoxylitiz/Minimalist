@@ -226,10 +226,8 @@ export function Hero() {
               <div className="absolute top-0 left-0 w-full h-full bg-sc-accent animate-scroll-line" />
             </div>
           </div>
-          <div className="text-right pb-1">
-            Curated Works &copy; {new Date().getFullYear()}
-          </div>
         </div>
+        <div className="transition-veil absolute inset-0 z-20 bg-sc-surface origin-bottom scale-y-0 pointer-events-none" />
       </section>
     </div>
   );
