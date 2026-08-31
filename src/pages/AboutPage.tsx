@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, React } from 'react';
+import { useRef, useState, React } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
 import { Navbar } from '../components/Navbar';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -11,7 +10,6 @@ const contactLinks = [
   { label: 'Email', value: 'hello@studio-oliver.com', href: 'mailto:hello@studio-oliver.com' },
   { label: 'LinkedIn', value: '/in/studio-oliver', href: '#' },
   { label: 'Instagram', value: '@studio.oliver', href: '#' },
-  { label: 'Read.cv', value: '/oliver', href: '#' },
 ];
 
 export default function ContactPage() {

@@ -49,10 +49,6 @@ export function Contact() {
           </div>
         </div>
       </div>
-      
-      <div className="absolute bottom-8 right-8 text-xs text-sc-text-muted">
-        &copy; {new Date().getFullYear()} Minimalist Portfolio
-      </div>
     </section>
   );
 }
