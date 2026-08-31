@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme {
+  /* Define fonts */
   --font-display: "Playfair Display", serif;
   --font-body: "Inter", sans-serif;
-  
+
+  /* Define colors - these generate .bg-sc-bg, .text-sc-text-primary etc. */
   --color-sc-bg: #0c0c0c;
   --color-sc-surface: #161616;
   --color-sc-text-primary: #f0f0f0;
@@ -14,24 +16,38 @@
 
 @layer base {
   :root {
-    --bg: #0c0c0c;
-    --surface: #161616;
-    --text-primary: #f0f0f0;
-    --text-muted: #a0a0a0;
-    --border: rgba(255, 255, 255, 0.1);
-    --accent: #c4a47c;
+    /* ✅ FIX: Map base variables to Tailwind v4 theme variables */
+    /* This ensures @layer base styles match your utility classes */
+    --bg: var(--color-sc-bg);
+    --surface: var(--color-sc-surface);
+    --text-primary: var(--color-sc-text-primary);
+    --text-muted: var(--color-sc-text-muted);
+    --border: var(--color-sc-border);
+    --accent: var(--color-sc-accent);
+
+    /* Font mapping for base layer consistency */
+    --font-display: var(--font-display);
+    --font-body: var(--font-body);
   }
 
-  html, body {
+  html,
+  body {
     background-color: var(--bg);
+    /* Now correctly resolves to #0c0c0c */
     color: var(--text-primary);
+    /* Now correctly resolves to #f0f0f0 */
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: auto; /* Replaced by Lenis */
+    scroll-behavior: auto;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
     font-weight: 400;
   }
@@ -67,9 +83,9 @@
 
 .noise-overlay {
   position: fixed;
-  top: 0; 
-  left: 0; 
-  width: 100vw; 
+  top: 0;
+  left: 0;
+  width: 100vw;
   height: 100vh;
   pointer-events: none;
   z-index: 9999;
@@ -78,9 +94,17 @@
 }
 
 @keyframes scroll-line {
-  0% { transform: translateY(-100%); }
-  50% { transform: translateY(0%); }
-  100% { transform: translateY(100%); }
+  0% {
+    transform: translateY(-100%);
+  }
+
+  50% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(100%);
+  }
 }
 
 .animate-scroll-line {
@@ -88,18 +112,192 @@
 }
 
 /* Lenis recommended CSS */
-html.lenis, html.lenis body {
+html.lenis,
+html.lenis body {
   height: auto;
 }
+
 .lenis.lenis-smooth {
   scroll-behavior: auto !important;
 }
+
 .lenis.lenis-smooth [data-lenis-prevent] {
   overscroll-behavior: contain;
 }
+
 .lenis.lenis-stopped {
   overflow: hidden;
 }
+
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* ─── Floating Navbar ──────────────────────────────────────────── */
+.navbar-float {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+
+  padding: 0.625rem 1.25rem 0.625rem 1.5rem;
+  border-radius: 9999px;
+
+  /* glass pill */
+  background: rgba(12, 12, 12, 0.55);
+  backdrop-filter: blur(18px) saturate(1.6);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+  /* entrance starts hidden (GSAP animates in) */
+  opacity: 0;
+  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+/* Deepen glass when user has scrolled */
+.navbar-float[data-scrolled='true'] {
+  background: rgba(12, 12, 12, 0.80);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Logo */
+.navbar-logo {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+
+.navbar-logo:hover {
+  color: var(--accent);
+}
+
+.navbar-logo-reg {
+  font-size: 0.55rem;
+  vertical-align: super;
+  opacity: 0.6;
+}
+
+/* Links list */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Individual link */
+.navbar-link {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 9999px;
+  transition: color 0.25s ease, background 0.25s ease;
+  overflow: hidden;
+}
+
+.navbar-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Animated underline */
+.navbar-link-line {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: 60%;
+  height: 1px;
+  background: var(--accent);
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 9999px;
+}
+
+.navbar-link--active {
+  color: var(--text-primary);
+}
+
+.navbar-link--active .navbar-link-line {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Status badge */
+.navbar-status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.navbar-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: status-pulse 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes status-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.8);
+  }
+}
+
+/* Mobile: hide status badge, condense gaps */
+@media (max-width: 480px) {
+  .navbar-float {
+    gap: 0.75rem;
+  }
+
+  .navbar-status {
+    display: none;
+  }
+
+  .navbar-link {
+    padding: 0.3rem 0.6rem;
+  }
 }

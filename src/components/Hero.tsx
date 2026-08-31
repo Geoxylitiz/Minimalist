@@ -1,5 +1,3 @@
-'use client';
-
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -23,11 +21,6 @@ export function Hero() {
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // ---- Scramble / decode title reveal ----
-      // Target text is read from data-text (set once in JSX), never from
-      // live textContent — textContent gets overwritten with scramble
-      // spans below, so re-running this effect (Strict Mode double-invoke,
-      // Fast Refresh, etc.) would otherwise "resolve" toward whatever
-      // garbled text was left over from the previous run.
       const scrambleEls = gsap.utils.toArray<HTMLElement>('.scramble');
       scrambleEls.forEach((el, lineIndex) => {
         const finalText = el.dataset.text ?? el.textContent ?? '';
@@ -53,11 +46,12 @@ export function Hero() {
           const state = { progress: 0 };
           gsap.to(state, {
             progress: 1,
-            duration: 0.9,
-            delay: 0.6 + lineIndex * 0.18 + charIndex * 0.028,
-            ease: 'power2.out',
+            duration: 0.35, // Snappier, more mechanical
+            delay: 0.8 + lineIndex * 0.12 + charIndex * 0.025, // Tighter stagger
+            ease: 'power3.out', // Sharper ease-out
             onUpdate: () => {
-              span.textContent = state.progress > 0.85 ? char : randomChar();
+              // Resolves to the true character in the last 25% of the animation
+              span.textContent = state.progress > 0.75 ? char : randomChar();
             },
             onComplete: () => {
               span.textContent = char;
@@ -100,45 +94,74 @@ export function Hero() {
         .to('.hero-parallax-bg', { yPercent: 20, opacity: 0.35, ease: 'none' }, 0)
         .to('.hero-fade', { opacity: 0, y: -20, ease: 'none' }, 0.1)
         .to('.hero-ghost', { opacity: 0.14, scale: 1.12, ease: 'none' }, 0)
-        .to('.hero-marquee', { xPercent: -12, ease: 'none' }, 0);
+        .to('.hero-marquee', { xPercent: -12, ease: 'none' }, 0)
+        .to('.transition-veil', {
+          scaleY: 1,
+          transformOrigin: 'bottom',
+          ease: 'power2.inOut'
+        }, 0.6); // Editorial curtain reveal
 
-      // ---- Ambient plasma canvas ----
+      // ---- Ambient plasma canvas (High-End Mesh Gradient Technique) ----
       const canvas = canvasRef.current;
-      const ctx = canvas?.getContext('2d');
-      if (!canvas || !ctx) return;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      if (!ctx) return;
 
-      let w = (canvas.width = canvas.offsetWidth);
-      let h = (canvas.height = canvas.offsetHeight);
-
-      const blobs = [
-        { x: 0.25, y: 0.35, r: 0.3, color: '#c4a47c', speed: 1 },
-        { x: 0.72, y: 0.6, r: 0.24, color: '#8a6d4a', speed: 0.8 },
-        { x: 0.5, y: 0.18, r: 0.2, color: '#3a3a3a', speed: 0.65 }
-      ];
+      // THE TRICK: Render at a low resolution and let CSS upscale + blur it.
+      const renderScale = 0.15;
+      let w = 0;
+      let h = 0;
 
       const resize = () => {
-        w = canvas.width = canvas.offsetWidth;
-        h = canvas.height = canvas.offsetHeight;
+        w = Math.floor(canvas.offsetWidth * renderScale);
+        h = Math.floor(canvas.offsetHeight * renderScale);
+        canvas.width = w;
+        canvas.height = h;
       };
+      resize();
       window.addEventListener('resize', resize);
+
+      // More organic, staggered blob configuration
+      const blobs = [
+        { x: 0.25, y: 0.35, r: 0.6, color: '#c4a47c', speed: 1.1, phase: 0 },   // Champagne Gold
+        { x: 0.75, y: 0.65, r: 0.5, color: '#8a6d4a', speed: 0.8, phase: 2 },   // Warm Bronze
+        { x: 0.50, y: 0.20, r: 0.4, color: '#2a2a2a', speed: 0.6, phase: 4 },   // Deep Slate Shadow
+        { x: 0.85, y: 0.25, r: 0.3, color: '#c4a47c', speed: 0.9, phase: 1.5 }, // Subtle Gold Accent
+      ];
 
       let t = 0;
       let raf: number;
+
       const render = () => {
-        t += 0.004;
+        t += 0.002; // Slower, more cinematic drift
         ctx.clearRect(0, 0, w, h);
+
+        // 'lighter' creates a beautiful luminous blending where colors overlap
+        ctx.globalCompositeOperation = 'lighter';
+
         blobs.forEach((b, i) => {
-          const bx = (b.x + Math.sin(t * b.speed + i) * 0.07) * w;
-          const by = (b.y + Math.cos(t * b.speed * 0.8 + i) * 0.07) * h;
-          const r = b.r * Math.max(w, h);
+          // Fractal movement (combining two sine waves) breaks the robotic feel
+          const noiseX = Math.sin(t * b.speed + b.phase) * 0.08 + Math.cos(t * b.speed * 0.6 + i) * 0.04;
+          const noiseY = Math.cos(t * b.speed * 0.8 + b.phase) * 0.08 + Math.sin(t * b.speed * 0.4 + i) * 0.04;
+
+          const bx = (b.x + noiseX) * w;
+          const by = (b.y + noiseY) * h;
+
+          // Radius scales relative to the smaller dimension to prevent clipping
+          const r = b.r * Math.min(w, h) * 1.2;
+
           const grad = ctx.createRadialGradient(bx, by, 0, bx, by, r);
-          grad.addColorStop(0, `${b.color}33`);
+          // Higher core alpha gives the CSS blur more "meat" to work with
+          grad.addColorStop(0, `${b.color}cc`);
+          grad.addColorStop(0.4, `${b.color}66`);
           grad.addColorStop(1, `${b.color}00`);
+
           ctx.fillStyle = grad;
           ctx.beginPath();
           ctx.arc(bx, by, r, 0, Math.PI * 2);
           ctx.fill();
         });
+
         raf = requestAnimationFrame(render);
       };
       render();
@@ -161,7 +184,12 @@ export function Hero() {
         {/* Ambient plasma canvas — WebGL-style glow without the dependency weight */}
         <canvas
           ref={canvasRef}
-          className="hero-parallax-bg absolute inset-0 z-0 w-full h-full pointer-events-none mix-blend-screen opacity-70"
+          className="hero-parallax-bg absolute inset-0 z-0 w-full h-full pointer-events-none mix-blend-lighten"
+          style={{
+            filter: 'blur(32px) contrast(1.15) saturate(1.2)',
+            opacity: 0.85,
+            imageRendering: 'auto'
+          }}
         />
 
         {/* Outlined ghost word, layered behind the title */}
@@ -170,7 +198,7 @@ export function Hero() {
             className="text-[26vw] font-display uppercase leading-none whitespace-nowrap"
             style={{ WebkitTextStroke: '1px var(--color-sc-accent)', color: 'transparent' }}
           >
-            Vision
+            Oliver
           </span>
         </div>
 
@@ -184,11 +212,8 @@ export function Hero() {
 
         {/* Top Nav */}
         <div className="sc-container hero-fade flex justify-between items-center text-[0.65rem] md:text-xs tracking-widest uppercase text-sc-text-muted z-10 w-full relative">
-          <div>Studio&reg;</div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-sc-accent animate-pulse" />
-            Available for Commissions
-          </div>
+
+
         </div>
 
         {/* Main Title */}
@@ -227,6 +252,8 @@ export function Hero() {
             </div>
           </div>
         </div>
+
+        {/* Editorial Page-Turn Curtain */}
         <div className="transition-veil absolute inset-0 z-20 bg-sc-surface origin-bottom scale-y-0 pointer-events-none" />
       </section>
     </div>
