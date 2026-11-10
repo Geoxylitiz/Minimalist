@@ -1,4 +1,4 @@
-import { useRef, useState, React } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -17,7 +17,7 @@ export default function ContactPage() {
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success'>('idle');
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormState('submitting');
     // Simulate submission — replace with actual API call
@@ -147,11 +147,8 @@ export default function ContactPage() {
                   className="w-full bg-transparent text-sc-text-primary text-lg md:text-xl outline-none appearance-none cursor-pointer [&>option]:bg-sc-surface"
                 >
                   <option value="">Select an option</option>
-                  <option value="brand">Brand Identity</option>
+                  <option value="brand">AI Automation Workflow</option>
                   <option value="web">Web Design & Development</option>
-                  <option value="motion">Motion & Animation</option>
-                  <option value="direction">Creative Direction</option>
-                  <option value="other">Other</option>
                 </select>
                 {/* Custom arrow */}
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-sc-text-muted">

@@ -1,63 +1,36 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Navbar } from '../components/Navbar';
+import { projects, type ProjectKind } from '../data/projects';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const projects = [
-  {
-    id: '01',
-    title: 'Lumina',
-    category: 'Digital Exhibition',
-    year: '2025',
-    tags: ['WebGL', 'Three.js', 'Motion'],
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop',
-    description: 'An immersive digital exhibition platform built around spatial audio and generative visuals. Each room reacts in real-time to the visitor\'s cursor path.',
-  },
-  {
-    id: '02',
-    title: 'Onyx',
-    category: 'Editorial Platform',
-    year: '2024',
-    tags: ['React', 'CMS', 'Typography'],
-    image: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2000&auto=format&fit=crop',
-    description: 'A bespoke editorial system for a luxury magazine. Custom variable-font renderer, infinite scroll canvas, and an editor dashboard built to eliminate latency.',
-  },
-  {
-    id: '03',
-    title: 'Verve',
-    category: 'Brand Identity',
-    year: '2024',
-    tags: ['Identity', 'Motion', 'Print'],
-    image: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop',
-    description: 'Complete brand overhaul for an architectural firm. Logotype constructed on a strict grid, with a motion system that adapts across every touchpoint.',
-  },
-  {
-    id: '04',
-    title: 'Aether',
-    category: 'Product Design',
-    year: '2023',
-    tags: ['UI/UX', 'Design System', 'Prototyping'],
-    image: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?q=80&w=2000&auto=format&fit=crop',
-    description: 'End-to-end product design for a fintech startup. Built the full design system from tokens to components, reducing engineering handoff time by 60%.',
-  },
+type ProjectFilter = 'all' | ProjectKind;
+
+const projectFilters: { label: string; value: ProjectFilter }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Automation', value: 'automation' },
+  { label: 'Web Design', value: 'webdesign' },
 ];
 
 export default function WorksPage() {
   const pageRef = useRef<HTMLDivElement>(null);
-
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>('all');
+  const filteredProjects = activeFilter === 'all'
+    ? projects
+    : projects.filter((project) => project.kind === activeFilter);
 
   return (
     <div ref={pageRef} className="bg-sc-bg min-h-screen text-sc-text-primary selection:bg-sc-accent selection:text-sc-bg">
       <div className="noise-overlay" />
       <Navbar />
 
-      {/* ── Hero Section ── */}
+      {/* Hero Section */}
       <header className="sc-container pt-48 pb-24 md:pb-32 border-b border-sc-border">
         <p className="wp-hero-meta text-[0.65rem] tracking-[0.3em] uppercase text-sc-accent mb-8">
-          Selected Works — {projects.length} Projects
+          Selected Works - {filteredProjects.length} Projects
         </p>
         <h1 className="overflow-hidden">
           <span className="wp-hero-line block text-[clamp(3.5rem,9vw,10rem)] font-display font-normal leading-[0.9] tracking-tighter uppercase">
@@ -69,9 +42,40 @@ export default function WorksPage() {
         </h1>
       </header>
 
-      {/* ── Project List ── */}
+      {/* Project Filters */}
+      <section className="sc-container border-b border-sc-border py-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <p className="text-[0.6rem] tracking-[0.25em] uppercase text-sc-text-muted">
+            Filter projects
+          </p>
+          <div className="flex flex-wrap gap-3" role="tablist" aria-label="Project filters">
+            {projectFilters.map((filter) => {
+              const isActive = activeFilter === filter.value;
+
+              return (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setActiveFilter(filter.value)}
+                  className={`min-h-10 px-5 text-[0.6rem] tracking-[0.2em] uppercase border transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sc-accent focus-visible:ring-offset-4 focus-visible:ring-offset-sc-bg ${
+                    isActive
+                      ? 'border-sc-accent bg-sc-accent text-sc-bg'
+                      : 'border-sc-border text-sc-text-muted hover:border-sc-accent hover:text-sc-text-primary'
+                  }`}
+                  role="tab"
+                  aria-selected={isActive}
+                >
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Project List */}
       <main className="sc-container">
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <Link
             key={project.id}
             to={`/works/${project.id}`}
@@ -135,9 +139,9 @@ export default function WorksPage() {
         ))}
       </main>
 
-      {/* ── Footer Strip ── */}
+      {/* Footer Strip */}
       <footer className="sc-container py-20 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.6rem] tracking-[0.25em] uppercase text-sc-text-muted">
-        <span>© {new Date().getFullYear()} — End of selected works</span>
+        <span>© {new Date().getFullYear()} - End of selected works</span>
         <Link
           to="/"
           className="hover:text-sc-accent transition-colors duration-200 flex items-center gap-2 group"

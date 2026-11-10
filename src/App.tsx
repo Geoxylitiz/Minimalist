@@ -4,7 +4,7 @@
  */
 
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
@@ -16,9 +16,21 @@ import { Hero } from './components/Hero';
 import { Works } from './components/Works';
 
 import WorksPage from './pages/WorksPage';
+import WorkDetailPage from './pages/WorkDetailPage';
 import AboutPage from './pages/AboutPage';
 
 gsap.registerPlugin(ScrollTrigger);
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }, [pathname]);
+
+  return null;
+}
 
 function HomeLayout() {
   useEffect(() => {
@@ -62,9 +74,11 @@ function HomeLayout() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<HomeLayout />} />
         <Route path="/works" element={<WorksPage />} />
+        <Route path="/works/:id" element={<WorkDetailPage />} />
         <Route path="/about" element={<AboutPage />} />
       </Routes>
     </BrowserRouter>
