@@ -1,303 +1,258 @@
 @import "tailwindcss";
 
+/* ─── Design tokens ─────────────────────────────────────────────
+   Bold colour-block system: four solid fields + one hot accent.
+   Every token becomes a utility: bg-cobalt, text-lime, border-ink/20 … */
 @theme {
-  /* Define fonts */
-  --font-display: "Playfair Display", serif;
-  --font-body: "Inter", sans-serif;
+  --color-cobalt: #2340ff;
+  --color-lime: #d7ff3a;
+  --color-ink: #0a0a0a;
+  --color-paper: #f3f1ea;
+  --color-flame: #ff5b2e;
 
-  /* Define colors - these generate .bg-sc-bg, .text-sc-text-primary etc. */
-  --color-sc-bg: #0c0c0c;
-  --color-sc-surface: #161616;
-  --color-sc-text-primary: #f0f0f0;
-  --color-sc-text-muted: #a0a0a0;
-  --color-sc-border: rgba(255, 255, 255, 0.1);
-  --color-sc-accent: #c4a47c;
+  --font-display: "Clash Display", "Archivo", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
-  :root {
-    /* ✅ FIX: Map base variables to Tailwind v4 theme variables */
-    /* This ensures @layer base styles match your utility classes */
-    --bg: var(--color-sc-bg);
-    --surface: var(--color-sc-surface);
-    --text-primary: var(--color-sc-text-primary);
-    --text-muted: var(--color-sc-text-muted);
-    --border: var(--color-sc-border);
-    --accent: var(--color-sc-accent);
-
-    /* Font mapping for base layer consistency */
-    --font-display: var(--font-display);
-    --font-body: var(--font-body);
-  }
-
-  html,
-  body {
-    background-color: var(--bg);
-    /* Now correctly resolves to #0c0c0c */
-    color: var(--text-primary);
-    /* Now correctly resolves to #f0f0f0 */
-    font-family: var(--font-body);
+  html {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    scroll-behavior: auto;
+    text-rendering: optimizeLegibility;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.55;
+  }
+
+  h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 600;
   }
 
-  p {
-    line-height: 1.6;
-    max-width: 65ch;
+  ::selection {
+    background: var(--color-lime);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-flame);
+    outline-offset: 3px;
   }
 }
 
-.sc-container {
+@layer components {
+/* ─── Layout ──────────────────────────────────────────────────── */
+.wrap {
   width: 100%;
-  max-width: 80rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  max-width: 96rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+@media (min-width: 640px)  { .wrap { padding-inline: 2rem; } }
+@media (min-width: 1024px) { .wrap { padding-inline: 3.5rem; } }
+
+/* ─── Type ────────────────────────────────────────────────────── */
+.display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
 }
 
-@media (min-width: 640px) {
-  .sc-container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+.label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.2;
 }
 
-@media (min-width: 1024px) {
-  .sc-container {
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
+/* Underline that grows from the left on hover */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.45s var(--ease-out-expo);
+  padding-bottom: 0.05em;
+}
+.link-underline:hover,
+.group:hover .link-underline,
+.link-underline:focus-visible { background-size: 100% 2px; }
+.link-underline--thick { background-size: 100% 0.08em; }
+.link-underline--thick:hover,
+.group:hover .link-underline--thick { background-size: 0% 0.08em; }
+
+/* ─── Buttons ─────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 3rem;
+  padding: 0 1.4rem;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: background-color 0.25s, color 0.25s, transform 0.25s var(--ease-out-expo);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+.btn--ink { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+.btn--ink:hover { background: var(--color-flame); border-color: var(--color-flame); color: var(--color-ink); }
+.btn--outline:hover { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+.btn--paper { background: var(--color-paper); color: var(--color-ink); border-color: var(--color-paper); }
+.btn--paper:hover { background: var(--color-lime); border-color: var(--color-lime); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-.noise-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.035;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-@keyframes scroll-line {
-  0% {
-    transform: translateY(-100%);
-  }
-
-  50% {
-    transform: translateY(0%);
-  }
-
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-.animate-scroll-line {
-  animation: scroll-line 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-/* Lenis recommended CSS */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
-/* ─── Floating Navbar ──────────────────────────────────────────── */
-.navbar-float {
-  position: fixed;
-  top: 1.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-
+/* ─── Marquee ─────────────────────────────────────────────────── */
+.marquee { overflow: hidden; white-space: nowrap; }
+.marquee-track { display: flex; width: max-content; animation: marquee 28s linear infinite; }
+.marquee--reverse .marquee-track { animation-direction: reverse; }
+.marquee-row {
   display: flex;
   align-items: center;
-  gap: 2rem;
-
-  padding: 0.625rem 1.25rem 0.625rem 1.5rem;
-  border-radius: 9999px;
-
-  /* glass pill */
-  background: rgba(12, 12, 12, 0.55);
-  backdrop-filter: blur(18px) saturate(1.6);
-  -webkit-backdrop-filter: blur(18px) saturate(1.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow:
-    0 4px 32px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-
-  /* entrance starts hidden (GSAP animates in) */
-  opacity: 0;
-  transition: background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  gap: 0.5em;
+  padding-right: 0.5em;
 }
+.marquee-row > * { flex-shrink: 0; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
 
-/* Deepen glass when user has scrolled */
-.navbar-float[data-scrolled='true'] {
-  background: rgba(12, 12, 12, 0.80);
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+.spin-slow { animation: spin 24s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Navbar ──────────────────────────────────────────────────── */
+.navbar {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  border-radius: 999px;
+  translate: -50% 0;
+  transition:
+    translate 0.5s var(--ease-out-expo),
+    background-color 0.35s,
+    color 0.35s;
+  max-width: calc(100vw - 1.5rem);
 }
+.navbar[data-hidden="true"] { translate: -50% calc(-100% - 1.5rem); }
 
-/* Logo */
+/* On dark fields (cobalt / ink) the pill is paper; on light fields it is ink. */
+.navbar[data-nav-theme="dark"]  { background: var(--color-paper); color: var(--color-ink); --nav-hover: var(--color-lime); --nav-active-bg: var(--color-ink); --nav-active-fg: var(--color-paper); }
+.navbar[data-nav-theme="light"] { background: var(--color-ink); color: var(--color-paper); --nav-hover: var(--color-cobalt); --nav-active-bg: var(--color-lime); --nav-active-fg: var(--color-ink); }
+
 .navbar-logo {
   font-family: var(--font-display);
-  font-size: 0.9rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  padding: 0 0.75rem 0 0.9rem;
   white-space: nowrap;
-  transition: color 0.25s ease;
 }
-
-.navbar-logo:hover {
-  color: var(--accent);
-}
-
-.navbar-logo-reg {
-  font-size: 0.55rem;
-  vertical-align: super;
-  opacity: 0.6;
-}
-
-/* Links list */
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Individual link */
+.navbar-links { display: flex; align-items: center; gap: 0.125rem; }
 .navbar-link {
-  position: relative;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  padding: 0.3rem 0.85rem;
-  font-family: var(--font-body);
-  font-size: 0.65rem;
-  letter-spacing: 0.18em;
+  min-height: 2.5rem;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  text-decoration: none;
-  border-radius: 9999px;
-  transition: color 0.25s ease, background 0.25s ease;
-  overflow: hidden;
+  transition: background-color 0.2s, color 0.2s;
 }
+.navbar-link:hover { background: var(--nav-hover); color: var(--color-ink); }
+.navbar[data-nav-theme="light"] .navbar-link:hover { color: var(--color-paper); }
+.navbar-link.is-active { background: var(--nav-active-bg); color: var(--nav-active-fg); }
 
-.navbar-link:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
-}
-
-/* Animated underline */
-.navbar-link-line {
-  position: absolute;
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%) scaleX(0);
-  width: 60%;
-  height: 1px;
-  background: var(--accent);
-  transform-origin: center;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  border-radius: 9999px;
-}
-
-.navbar-link--active {
-  color: var(--text-primary);
-}
-
-.navbar-link--active .navbar-link-line {
-  transform: translateX(-50%) scaleX(1);
-}
-
-/* Status badge */
 .navbar-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 0.6rem;
-  letter-spacing: 0.16em;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 0.95rem;
+  border-radius: 999px;
+  background: var(--color-flame);
+  color: var(--color-ink);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
   white-space: nowrap;
-  padding: 0.3rem 0.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.03);
 }
-
 .navbar-status-dot {
-  width: 6px;
-  height: 6px;
+  width: 0.5rem;
+  height: 0.5rem;
   border-radius: 50%;
-  background: var(--accent);
-  animation: status-pulse 2.5s ease-in-out infinite;
-  flex-shrink: 0;
+  background: var(--color-ink);
+  animation: pulse 1.8s ease-in-out infinite;
 }
+@keyframes pulse { 50% { opacity: 0.3; transform: scale(0.7); } }
 
-@keyframes status-pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  50% {
-    opacity: 0.45;
-    transform: scale(0.8);
-  }
+@media (max-width: 720px) {
+  .navbar-status { display: none; }
 }
-
-/* Mobile: hide status badge, condense gaps */
 @media (max-width: 480px) {
-  .navbar-float {
-    gap: 0.75rem;
-  }
+  .navbar { gap: 0; top: 0.75rem; }
+  .navbar-logo { display: none; }
+  .navbar-link { padding: 0 0.7rem; font-size: 0.7rem; min-height: 2.4rem; }
+}
 
-  .navbar-status {
-    display: none;
-  }
+/* ─── Misc ────────────────────────────────────────────────────── */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--color-lime);
+  color: var(--color-ink);
+  font-weight: 600;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
 
-  .navbar-link {
-    padding: 0.3rem 0.6rem;
-  }
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .spin-slow,
+  .navbar-status-dot { animation: none; }
+  .navbar { transition: none; }
+  /* No pinned sideways scroll: let the strip scroll on its own instead. */
+  .works-track { width: auto; max-width: 100%; overflow-x: auto; }
 }

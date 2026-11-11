@@ -1,135 +1,112 @@
+import { useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Navbar } from '../components/Navbar';
-import { projects } from '../data/projects';
+import { projects, kindLabel } from '../data/projects';
+import { useReveal } from '../hooks/useReveal';
+import { Arrow, Label, Line } from '../components/ui';
+
+/** Pick a nav theme for an arbitrary project colour from its ink. */
+const themeFor = (ink: string) => (ink.toLowerCase() === '#0a0a0a' ? 'light' : 'dark');
 
 export default function WorkDetailPage() {
   const { id } = useParams();
-  const project = projects.find((item) => item.id === id);
+  const ref = useRef<HTMLDivElement>(null);
+  useReveal(ref);
+
+  const index = projects.findIndex((p) => p.id === id);
+  const project = projects[index];
 
   if (!project) {
     return (
-      <div className="bg-sc-bg min-h-screen text-sc-text-primary selection:bg-sc-accent selection:text-sc-bg">
-        <div className="noise-overlay" />
-        <Navbar />
-        <main className="sc-container min-h-screen flex flex-col justify-center py-48">
-          <p className="text-[0.65rem] tracking-[0.3em] uppercase text-sc-accent mb-8">
-            Project not found
-          </p>
-          <h1 className="text-[clamp(3.5rem,9vw,9rem)] font-display font-normal leading-[0.9] tracking-tighter uppercase max-w-4xl">
-            No work here
-          </h1>
-          <Link
-            to="/works"
-            className="mt-12 inline-flex w-fit items-center gap-3 text-[0.65rem] tracking-[0.2em] uppercase text-sc-text-muted hover:text-sc-accent transition-colors duration-300"
-          >
-            <span className="transition-transform duration-300">←</span>
-            Back to Works
+      <section className="bg-cobalt text-paper min-h-svh flex items-center" data-theme="dark">
+        <div className="wrap py-40">
+          <Label>Error 404</Label>
+          <h1 className="display mt-6 text-[clamp(3.5rem,12vw,12rem)]">No work<br />here</h1>
+          <Link to="/works" className="btn btn--paper mt-12">
+            <Arrow direction="left" className="w-4 h-4" /> Back to works
           </Link>
-        </main>
-      </div>
+        </div>
+      </section>
     );
   }
 
-  return (
-    <div className="bg-sc-bg min-h-screen text-sc-text-primary selection:bg-sc-accent selection:text-sc-bg">
-      <div className="noise-overlay" />
-      <Navbar />
+  const next = projects[(index + 1) % projects.length];
+  const facts = [
+    ['Year', project.year],
+    ['Type', kindLabel[project.kind]],
+    ['Category', project.category],
+    ['Role', project.role],
+  ];
 
-      <header className="sc-container pt-48 pb-16 md:pb-24 border-b border-sc-border">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-          <div className="md:col-span-8">
-            <p className="text-[0.65rem] tracking-[0.3em] uppercase text-sc-accent mb-8">
-              {project.category} - {project.year}
-            </p>
-            <h1 className="text-[clamp(4rem,11vw,11rem)] font-display font-normal leading-[0.85] tracking-tighter uppercase">
-              {project.title}
-            </h1>
+  return (
+    <div ref={ref} key={project.id}>
+      <header style={{ backgroundColor: project.color, color: project.ink }} data-theme={themeFor(project.ink)}>
+        <div className="wrap pt-32 md:pt-44 pb-12 md:pb-16">
+          <Link to="/works" className="reveal-up label inline-flex items-center gap-2 hover:underline underline-offset-4">
+            <Arrow direction="left" className="w-3.5 h-3.5" /> All works
+          </Link>
+          <h1 className="display mt-8 text-[clamp(4rem,17vw,17rem)]">
+            <Line>{project.title}</Line>
+          </h1>
+          <div className="mt-10 grid gap-8 md:grid-cols-12 items-end">
+            <p className="reveal-up md:col-span-6 text-lg md:text-xl max-w-xl">{project.description}</p>
+            <div className="reveal-up md:col-span-6 flex flex-wrap md:justify-end gap-2">
+              {project.tags.map((t) => <span key={t} className="chip">{t}</span>)}
+            </div>
           </div>
-          <div className="md:col-span-4 md:self-end">
-            <p className="text-sc-text-muted text-sm leading-relaxed">
-              {project.description}
-            </p>
+        </div>
+
+        <div className="wrap pb-6 md:pb-10">
+          <div className="reveal-up aspect-[16/10] md:aspect-[16/8] overflow-hidden rounded-[1.25rem] bg-ink/10">
+            <img src={project.image} alt={`${project.title} project preview`} className="h-full w-full object-cover" />
           </div>
         </div>
       </header>
 
-      <main>
-        <section className="sc-container py-12 md:py-16">
-          <div className="aspect-[16/10] overflow-hidden bg-sc-surface">
-            <img
-              src={project.image}
-              alt={project.title}
-              className="h-full w-full object-cover"
-            />
-          </div>
-        </section>
-
-        <section className="sc-container py-16 md:py-24 border-y border-sc-border">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
-            <div className="md:col-span-7">
-              <p className="text-[0.6rem] tracking-[0.25em] uppercase text-sc-accent mb-6">
-                Overview
-              </p>
-              <p className="text-xl md:text-3xl font-display leading-snug text-sc-text-primary max-w-3xl">
-                {project.overview}
-              </p>
-            </div>
-
-            <div className="md:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-10">
-              <div>
-                <p className="text-[0.55rem] tracking-[0.2em] uppercase text-sc-text-muted mb-4">
-                  Role
-                </p>
-                <p className="text-sm leading-relaxed text-sc-text-primary">
-                  {project.role}
-                </p>
-              </div>
-              <div>
-                <p className="text-[0.55rem] tracking-[0.2em] uppercase text-sc-text-muted mb-4">
-                  Type
-                </p>
-                <p className="text-sm leading-relaxed text-sc-text-primary uppercase">
-                  {project.kind === 'webdesign' ? 'Web Design' : 'Automation'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="sc-container py-16 md:py-24 border-b border-sc-border">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
-            <p className="md:col-span-3 text-[0.6rem] tracking-[0.25em] uppercase text-sc-text-muted">
-              Services
+      <section className="bg-paper text-ink" data-theme="light">
+        <div className="wrap py-20 md:py-32 grid gap-14 md:grid-cols-12">
+          <div className="md:col-span-7">
+            <Label className="reveal-up mb-6">Overview</Label>
+            <p className="reveal-up font-display font-medium text-[clamp(1.6rem,3.2vw,3rem)] leading-[1.08] tracking-[-0.02em]">
+              {project.overview}
             </p>
-            <div className="md:col-span-9 flex flex-wrap gap-3">
-              {project.services.map((service) => (
-                <span
-                  key={service}
-                  className="px-4 py-2 border border-sc-border text-[0.6rem] tracking-[0.2em] uppercase text-sc-text-muted"
-                >
-                  {service}
-                </span>
-              ))}
-            </div>
           </div>
-        </section>
-      </main>
 
-      <footer className="sc-container py-20 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.6rem] tracking-[0.25em] uppercase text-sc-text-muted">
-        <Link
-          to="/works"
-          className="hover:text-sc-accent transition-colors duration-200 flex items-center gap-2 group"
-        >
-          <span className="group-hover:-translate-x-1 transition-transform duration-200">←</span>
-          Back to Works
-        </Link>
-        <Link
-          to="/"
-          className="hover:text-sc-accent transition-colors duration-200"
-        >
-          Home
-        </Link>
-      </footer>
+          <dl className="md:col-span-4 md:col-start-9 border-t-2 border-ink">
+            {facts.map(([k, v]) => (
+              <div key={k} className="reveal-up grid grid-cols-3 gap-4 py-4 border-b-2 border-ink">
+                <dt className="label pt-1">{k}</dt>
+                <dd className="col-span-2">{v}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="wrap pb-20 md:pb-32">
+          <Label className="reveal-up mb-6">Services</Label>
+          <ul className="flex flex-wrap gap-3">
+            {project.services.map((s) => (
+              <li key={s} className="reveal-up display text-[clamp(1.75rem,4vw,3.5rem)] px-5 py-3 rounded-full bg-ink text-paper">
+                {s}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <Link
+        to={`/works/${next.id}`}
+        className="group block"
+        style={{ backgroundColor: next.color, color: next.ink }}
+        data-theme={themeFor(next.ink)}
+      >
+        <div className="wrap py-20 md:py-28 flex items-end justify-between gap-6">
+          <div>
+            <Label>Next project</Label>
+            <p className="display mt-4 text-[clamp(3.5rem,12vw,12rem)]">{next.title}</p>
+          </div>
+          <Arrow direction="right" className="w-[clamp(3rem,8vw,7rem)] h-[clamp(3rem,8vw,7rem)] shrink-0 transition-transform duration-500 ease-out-expo group-hover:translate-x-3" />
+        </div>
+      </Link>
     </div>
   );
 }

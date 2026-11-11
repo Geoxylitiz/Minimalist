@@ -12,8 +12,18 @@ export type Project = {
   overview: string;
   role: string;
   services: string[];
+  /** Colour field used behind the project wherever it appears. */
+  color: string;
+  /** Text colour that reads on `color`. */
+  ink: string;
 };
 
+export const kindLabel: Record<ProjectKind, string> = {
+  webdesign: 'Web Design',
+  automation: 'Automation',
+};
+
+// Placeholder projects and stock imagery — swap for real work later.
 export const projects: Project[] = [
   {
     id: '01',
@@ -27,6 +37,8 @@ export const projects: Project[] = [
     overview: 'Lumina turns a traditional exhibition archive into a cinematic browser experience, combining motion-led navigation with responsive visual systems that feel tactile without slowing the site down.',
     role: 'Creative development, interaction design, front-end engineering',
     services: ['Experience Design', 'React Build', 'Motion System'],
+    color: '#ff5b2e',
+    ink: '#0a0a0a',
   },
   {
     id: '02',
@@ -40,6 +52,8 @@ export const projects: Project[] = [
     overview: 'Onyx focuses on publishing operations: reusable editorial blocks, automated image treatments, and a lean dashboard that keeps writers and editors moving through production without friction.',
     role: 'System architecture, CMS workflow, front-end engineering',
     services: ['CMS Automation', 'Editorial Tools', 'Performance'],
+    color: '#d7ff3a',
+    ink: '#0a0a0a',
   },
   {
     id: '03',
@@ -53,6 +67,8 @@ export const projects: Project[] = [
     overview: 'Verve extends a refreshed identity into a digital presence with precise layouts, restrained motion, and a portfolio structure designed for scanning detailed architectural work.',
     role: 'Brand direction, web design, interaction design',
     services: ['Identity System', 'Website Design', 'Motion Direction'],
+    color: '#2340ff',
+    ink: '#f3f1ea',
   },
   {
     id: '04',
@@ -66,5 +82,7 @@ export const projects: Project[] = [
     overview: 'Aether brings product design and operational automation together through reusable interface patterns, documented component behavior, and prototype flows that make handoff faster.',
     role: 'Product design, design systems, prototype automation',
     services: ['Design System', 'UX Flows', 'Prototype Tooling'],
+    color: '#f3f1ea',
+    ink: '#0a0a0a',
   },
 ];
